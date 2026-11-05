@@ -57,10 +57,26 @@ const envSchema = z
     GEMINI_API_KEY: z.string().optional(),
     GEMINI_EMBEDDING_MODEL: z.string().default('text-embedding-004'),
     GEMINI_CHAT_MODEL: z.string().default('gemini-2.5-flash'),
+    GEMINI_TIMEOUT_MS: z.coerce.number().int().positive().default(45000),
     CHUNK_SIZE: z.coerce.number().int().positive().default(1000),
     CHUNK_OVERLAP: z.coerce.number().int().nonnegative().default(200),
     RAG_MAX_CONTEXT_CHUNKS: z.coerce.number().int().positive().default(6),
     RAG_MIN_SIMILARITY_SCORE: z.coerce.number().min(0).max(1).default(0.60),
+
+    // External Web Research
+    TAVILY_API_KEY: z.string().optional(),
+    SERPER_API_KEY: z.string().optional(),
+    WEB_SEARCH_MAX_RESULTS: z.coerce.number().int().min(1).max(15).default(5),
+    WEB_FETCH_TIMEOUT_MS: z.coerce.number().int().positive().default(10000),
+
+    // AI Research Agent
+    AGENT_MAX_STEPS: z.coerce.number().int().min(1).max(20).default(8),
+
+    // Production Readiness: Rate Limiting & Caching
+    RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(60000),
+    RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(100),
+    AI_RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(20),
+    REDIS_URL: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.STORAGE_PROVIDER === "cloudinary") {

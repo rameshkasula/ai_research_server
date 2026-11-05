@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authenticate } from '../../common/middlewares/auth.middleware';
 import { validateRequest } from '../../common/middlewares/validateRequest';
 import { workspaceDocumentRoutes } from '../document/document.routes';
+import { workspaceConversationRoutes } from '../conversation/conversation.routes';
 import { workspaceController } from './workspace.controller';
 import {
   createWorkspaceBodySchema,
@@ -14,6 +15,9 @@ const router = Router();
 
 // Nested workspace document routes (/api/workspaces/:workspaceId/documents)
 router.use('/:workspaceId/documents', workspaceDocumentRoutes);
+
+// Nested workspace conversation routes (/api/workspaces/:workspaceId/conversations)
+router.use('/:workspaceId/conversations', workspaceConversationRoutes);
 
 // All workspace routes require authentication
 router.use(authenticate);

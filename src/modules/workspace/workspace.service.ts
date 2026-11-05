@@ -1,6 +1,10 @@
 import mongoose from 'mongoose';
 import { AppError } from '../../common/errors/AppError';
 import { documentService } from '../document/document.service';
+import { conversationService } from '../conversation/conversation.service';
+import { WebSourceModel } from '../web-research/webSource.model';
+import { AgentRunModel } from '../agent/agentRun.model';
+import { ReportModel } from '../report/report.model';
 import { IWorkspace, WorkspaceModel } from './workspace.model';
 import {
   CreateWorkspaceInput,
@@ -243,7 +247,14 @@ export class WorkspaceService {
 
   async deleteWorkspace(userId: string, workspaceId: string): Promise<void> {
     const workspace = await this.getOwnedWorkspaceOrThrow(userId, workspaceId);
-    await documentService.deleteAllWorkspaceDocuments(String(workspace._id));
+    const wsId = workspace._id;
+    await Promise.all([
+      documentService.deleteAllWorkspaceDocuments(String(wsId)),
+      conversationService.deleteConversationsByWorkspace(String(wsId)),
+      WebSourceModel.deleteMany({ workspaceId: wsId }),
+      AgentRunModel.deleteMany({ workspaceId: wsId }),
+      ReportModel.deleteMany({ workspaceId: wsId }),
+    ]);
     await workspace.deleteOne();
   }
 }
